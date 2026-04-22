@@ -7,6 +7,9 @@ on:
   # 수동 실행 (테스트용)
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   generate-preview:
     runs-on: ubuntu-latest
