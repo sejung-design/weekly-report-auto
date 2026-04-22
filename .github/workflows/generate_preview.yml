@@ -25,7 +25,7 @@ jobs:
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-          GITHUB_PAGES_BASE_URL: ${{ secrets.GITHUB_PAGES_BASE_URL }}
+          GITHUB_PAGES_BASE_URL: ${{ secrets.GIT_PAGES_BASE_URL }}
         run: |
           output=$(python scripts/generate_preview.py)
           echo "$output"
