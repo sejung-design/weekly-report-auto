@@ -254,9 +254,18 @@ def send_email(config, html_body, subject):
 
     all_recipients = recipients + cc
     ctx = ssl.create_default_context()
-    with smtplib.SMTP_SSL(smtp["host"], smtp["port"], context=ctx) as server:
-        server.login(smtp["user"], smtp["password"])
-        server.sendmail(smtp["user"], all_recipients, msg.as_string())
+    try:
+        # 먼저 STARTTLS(587) 시도
+        with smtplib.SMTP(smtp["host"], 587, timeout=30) as server:
+            server.ehlo()
+            server.starttls(context=ctx)
+            server.login(smtp["user"], smtp["password"])
+            server.sendmail(smtp["user"], all_recipients, msg.as_string())
+    except Exception as e1:
+        print(f"STARTTLS 실패: {e1}, SSL로 재시도...")
+        with smtplib.SMTP_SSL(smtp["host"], smtp["port"], context=ctx, timeout=30) as server:
+            server.login(smtp["user"], smtp["password"])
+            server.sendmail(smtp["user"], all_recipients, msg.as_string())
 
     mode = "테스트 " if config["test_mode"] else ""
     print(f"{mode}이메일 발송 완료 → {', '.join(recipients)}")
