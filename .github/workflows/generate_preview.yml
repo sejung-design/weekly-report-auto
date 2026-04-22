@@ -1,0 +1,42 @@
+name: 미리보기 HTML 생성
+
+on:
+  # 매주 금요일 13:00~20:00 KST (04:00~11:00 UTC), 10분마다 확인
+  schedule:
+    - cron: '*/10 4-11 * * 5'
+  # 수동 실행 (테스트용)
+  workflow_dispatch:
+
+jobs:
+  generate-preview:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: HTML 미리보기 생성
+        id: generate
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          GITHUB_PAGES_BASE_URL: ${{ secrets.GITHUB_PAGES_BASE_URL }}
+        run: |
+          output=$(python scripts/generate_preview.py)
+          echo "$output"
+          file=$(echo "$output" | grep "^OUTPUT_FILE=" | cut -d'=' -f2-)
+          echo "output_file=$file" >> $GITHUB_OUTPUT
+
+      - name: HTML 파일 커밋 & 푸시
+        if: steps.generate.outputs.output_file != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add previews/
+          git diff --cached --quiet || git commit -m "auto: 미리보기 HTML 생성"
+          git push
