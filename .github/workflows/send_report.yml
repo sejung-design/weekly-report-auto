@@ -1,0 +1,44 @@
+name: 주간업무보고 자동 발송
+
+on:
+  # 매주 금요일 13:00~20:00 KST (04:00~11:00 UTC), 30분마다 확인
+  schedule:
+    - cron: '0,30 4-11 * * 5'
+  # 수동 실행 (테스트용)
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: '테스트 모드 (본인 이메일로만 발송)'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 보고서 발송
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          RECIPIENTS: ${{ secrets.RECIPIENTS }}
+          CC: ${{ secrets.CC }}
+          SENDER_NAME: Design Center
+          TEST_MODE: ${{ github.event.inputs.test_mode || 'false' }}
+        run: python scripts/cloud_send_report.py
