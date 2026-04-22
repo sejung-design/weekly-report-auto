@@ -1,0 +1,10 @@
+config/secrets.json
+secrets.json
+*.pyc
+__pycache__/
+_deploy_test/
+_deploy_test_2/
+etc/
+reports/
+*.zip
+.claude/
