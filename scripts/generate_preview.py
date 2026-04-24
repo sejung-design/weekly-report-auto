@@ -12,7 +12,7 @@ import html as html_lib
 import json
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from urllib import error, request
 
@@ -115,8 +115,10 @@ def build_html(page, api_key):
     week = f"W{int(float(week_num))}" if week_num else "W??"
     date_str = get_prop(page, "보고일", "date")
     try:
-        monday = datetime.strptime(date_str, "%Y-%m-%d")
-        date_range = f"{monday.month}.{monday.day}-{monday.month}.{monday.day + 4}"
+        report_date = datetime.strptime(date_str, "%Y-%m-%d")
+        monday = report_date - timedelta(days=report_date.weekday())
+        friday = monday + timedelta(days=4)
+        date_range = f"{monday.month}.{monday.day}-{friday.month}.{friday.day}"
     except (ValueError, TypeError):
         date_range = date_str or ""
 
@@ -124,19 +126,41 @@ def build_html(page, api_key):
     subject = f"[Design Center] 주간업무보고 | {yy}년 {week} ({date_range})"
     s = parse_blocks(api_key, page["id"])
 
+    def cell(text):
+        return html_lib.escape(text).replace("\n", "<br>")
+
     summary_html = "".join(f"<li style='margin:0 0 6px 0'>{html_lib.escape(i)}</li>" for i in s["summary_items"])
     task_rows_html = "".join(
         f"<tr>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555'>{html_lib.escape(r[0])}</td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222'>{html_lib.escape(r[1])}</td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center'>{html_lib.escape(r[2])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555;vertical-align:top'>{cell(r[0])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222;vertical-align:top'>{cell(r[1])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center;vertical-align:top;white-space:nowrap'>{cell(r[2])}</td>"
         f"</tr>" for r in s["task_rows"]
     )
     next_plan_html = "".join(f"<li style='margin:0 0 6px 0'>{html_lib.escape(i)}</li>" for i in s["next_plan_items"])
-    note_html = (
-        f"<div style='padding:0 28px 28px'><h2 style='font-size:14px;margin:0 0 10px 0;color:#666'>💬 비고</h2>"
-        f"<p style='margin:0;color:#222;line-height:1.7'>{html_lib.escape(s['note_text'])}</p></div>"
-    ) if s["note_text"] else ""
+
+    summary_section = (
+        f"<div style='padding:28px 28px 20px'>"
+        f"<h2 style='font-size:14px;margin:0 0 10px 0;color:#666'>📌 이번 주 핵심 요약</h2>"
+        f"<ul style='margin:0;padding-left:20px;color:#222;line-height:1.7'>{summary_html}</ul>"
+        f"</div>"
+    ) if s["summary_items"] else ""
+
+    next_plan_section = (
+        f"<div style='padding:0 28px 20px'>"
+        f"<h2 style='font-size:14px;margin:0 0 10px 0;color:#666'>🔜 다음 주 계획</h2>"
+        f"<ul style='margin:0;padding-left:20px;color:#222;line-height:1.7'>{next_plan_html}</ul>"
+        f"</div>"
+    ) if s["next_plan_items"] else ""
+
+    note_section = (
+        f"<div style='padding:0 28px 28px'>"
+        f"<h2 style='font-size:14px;margin:0 0 10px 0;color:#666'>💬 비고</h2>"
+        f"<p style='margin:0;color:#222;line-height:1.7'>{html_lib.escape(s['note_text'])}</p>"
+        f"</div>"
+    ) if s["note_text"] and s["note_text"] != "없음" else ""
+
+    top_pad = "28px" if not s["summary_items"] else "0"
 
     body = f"""<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>{html_lib.escape(subject)}</title></head>
@@ -158,30 +182,24 @@ def build_html(page, api_key):
         </div>
       </div>
     </div>
-    <div style="padding:28px 28px 20px">
-      <h2 style="font-size:14px;margin:0 0 10px 0;color:#666">📌 이번 주 핵심 요약</h2>
-      <ul style="margin:0;padding-left:20px;color:#222;line-height:1.7">{summary_html}</ul>
-    </div>
-    <div style="padding:0 28px 20px">
+    {summary_section}
+    <div style="padding:{top_pad} 28px 20px">
       <h2 style="font-size:14px;margin:0 0 10px 0;color:#666">✅ 이번 주 주요 업무</h2>
       <table style="width:100%;border-collapse:collapse;border:1px solid #ececec;">
         <thead><tr style="background:#fafafa;">
-          <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;">구분</th>
+          <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;width:20%">구분</th>
           <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;">내용</th>
-          <th style="padding:10px 12px;text-align:center;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;">상태</th>
+          <th style="padding:10px 12px;text-align:center;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;width:15%">상태</th>
         </tr></thead>
         <tbody>{task_rows_html}</tbody>
       </table>
     </div>
-    <div style="padding:0 28px 20px">
-      <h2 style="font-size:14px;margin:0 0 10px 0;color:#666">🔜 다음 주 계획</h2>
-      <ul style="margin:0;padding-left:20px;color:#222;line-height:1.7">{next_plan_html}</ul>
-    </div>
+    {next_plan_section}
     <div style="padding:0 28px 20px">
       <h2 style="font-size:14px;margin:0 0 10px 0;color:#666">⚠️ 이슈 / 협조 요청</h2>
       <p style="margin:0;color:#222;line-height:1.7">{html_lib.escape(s['issue_text'])}</p>
     </div>
-    {note_html}
+    {note_section}
   </div>
 </body></html>"""
 
