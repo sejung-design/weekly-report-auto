@@ -160,18 +160,14 @@ def build_html(page, api_key) -> tuple[str, str]:
 
     sections = parse_page_blocks(api_key, page["id"])
 
-    summary_html = "".join(
-        f"<li style='margin:0 0 6px 0'>{html_lib.escape(item)}</li>"
-        for item in sections["summary_items"]
-    )
-    def cell(text, color):
+    def cell(text):
         return html_lib.escape(text).replace("\n", "<br>")
 
     task_rows_html = "".join(
         f"<tr>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555;vertical-align:top'>{cell(r[0], '')}</td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222;vertical-align:top'>{cell(r[1], '')}</td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center;vertical-align:top;white-space:nowrap'>{cell(r[2], '')}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555;vertical-align:top'>{cell(r[0])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222;vertical-align:top'>{cell(r[1])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center;vertical-align:top;white-space:nowrap'>{cell(r[2])}</td>"
         f"</tr>"
         for r in sections["task_rows"]
     )
@@ -179,13 +175,6 @@ def build_html(page, api_key) -> tuple[str, str]:
         f"<li style='margin:0 0 6px 0'>{html_lib.escape(item)}</li>"
         for item in sections["next_plan_items"]
     )
-
-    summary_section = (
-        f"<div style='padding:28px 28px 20px'>"
-        f"<h2 style='font-size:14px;margin:0 0 10px 0;color:#666'>📌 이번 주 핵심 요약</h2>"
-        f"<ul style='margin:0;padding-left:20px;color:#222;line-height:1.7'>{summary_html}</ul>"
-        f"</div>"
-    ) if sections["summary_items"] else ""
 
     next_plan_section = (
         f"<div style='padding:0 28px 20px'>"
@@ -208,7 +197,7 @@ def build_html(page, api_key) -> tuple[str, str]:
   <p style="font-size:12px;color:#888;margin:0 0 12px 0;">
     ✂ 아래 내용을 전체 선택(Ctrl+A) → 복사(Ctrl+C) → Mailplug 본문에 붙여넣기(Ctrl+V) 하세요.
   </p>
-  <div style="max-width:760px;margin:0;background:#ffffff;border:2px solid #d0d0d0;border-radius:12px;overflow:hidden;">
+  <div style="max-width:900px;margin:0;background:#ffffff;border:2px solid #d0d0d0;border-radius:12px;overflow:hidden;">
     <div style="background:#18212f;padding:28px;color:#ffffff;">
       <div style="font-size:11px;letter-spacing:1.6px;color:#9eb0c9;">DESIGN CENTER</div>
       <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-end;margin-top:12px;">
@@ -222,15 +211,14 @@ def build_html(page, api_key) -> tuple[str, str]:
         </div>
       </div>
     </div>
-    {summary_section}
-    <div style="padding:{'28px' if not sections['summary_items'] else '0'} 28px 20px">
+    <div style="padding:28px 28px 20px">
       <h2 style="font-size:14px;margin:0 0 10px 0;color:#666">✅ 이번 주 주요 업무</h2>
       <table style="width:100%;border-collapse:collapse;border:1px solid #ececec;">
         <thead>
           <tr style="background:#fafafa;">
-            <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;width:20%">구분</th>
+            <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;width:18%">구분</th>
             <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;">내용</th>
-            <th style="padding:10px 12px;text-align:center;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;width:15%">상태</th>
+            <th style="padding:10px 12px;text-align:center;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;width:80px">상태</th>
           </tr>
         </thead>
         <tbody>{task_rows_html}</tbody>
