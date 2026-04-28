@@ -131,11 +131,12 @@ def build_html(page, api_key):
 
     summary_html = "".join(f"<li style='margin:0 0 6px 0'>{html_lib.escape(i)}</li>" for i in s["summary_items"])
     F = "font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;"
+    FS = f"font-size:11pt;{F}"
     task_rows_html = "".join(
         f"<tr>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555;vertical-align:top;{F}font-size:11pt'>{cell(r[0])}</td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222;vertical-align:top;{F}font-size:11pt'>{cell(r[1])}</td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center;vertical-align:top;white-space:nowrap;{F}font-size:11pt'>{cell(r[2])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;vertical-align:top;'><span style='color:#555;{FS}'>{cell(r[0])}</span></td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;vertical-align:top;'><span style='color:#222;{FS}'>{cell(r[1])}</span></td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;text-align:center;vertical-align:top;white-space:nowrap;'><span style='color:#0b6bcb;{FS}'>{cell(r[2])}</span></td>"
         f"</tr>" for r in s["task_rows"]
     )
     next_plan_html = "".join(f"<li style='margin:0 0 6px 0'>{html_lib.escape(i)}</li>" for i in s["next_plan_items"])
