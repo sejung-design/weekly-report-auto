@@ -140,18 +140,18 @@ def build_html(page, api_key):
     next_plan_html = "".join(f"<li style='margin:0 0 6px 0'>{html_lib.escape(i)}</li>" for i in s["next_plan_items"])
 
     next_plan_items_html = "".join(
-        f"<tr><td style='padding:2px 0;color:#222;font-size:14px;line-height:1.7'>&bull; {html_lib.escape(i)}</td></tr>"
+        f"<tr><td colspan='2' style='padding:2px 0;color:#222;font-size:14px;line-height:1.7'>&bull; {html_lib.escape(i)}</td></tr>"
         for i in s["next_plan_items"]
     )
     next_plan_section = (
-        f"<tr><td style='padding:0 28px 20px'>"
+        f"<tr><td colspan='2' style='padding:0 28px 20px;background:#ffffff;'>"
         f"<p style='font-size:14px;margin:0 0 10px 0;color:#666;font-weight:600'>🔜 다음 주 계획</p>"
-        f"<table style='border-collapse:collapse;width:100%'>{next_plan_items_html}</table>"
+        f"<table width='100%' cellpadding='0' cellspacing='0' style='border-collapse:collapse;'>{next_plan_items_html}</table>"
         f"</td></tr>"
     ) if s["next_plan_items"] else ""
 
     note_section = (
-        f"<tr><td style='padding:0 28px 28px'>"
+        f"<tr><td colspan='2' style='padding:0 28px 28px;background:#ffffff;'>"
         f"<p style='font-size:14px;margin:0 0 10px 0;color:#666;font-weight:600'>💬 비고</p>"
         f"<p style='margin:0;color:#222;line-height:1.7;font-size:14px'>{html_lib.escape(s['note_text'])}</p>"
         f"</td></tr>"
@@ -163,43 +163,53 @@ def build_html(page, api_key):
   <p style="font-size:12px;color:#888;margin:0 0 12px 0;">
     ✂ 전체 선택(Ctrl+A 또는 ⌘A) → 복사 → Mailplug 붙여넣기 후 발송하세요.
   </p>
-  <table style="max-width:900px;width:100%;border-collapse:collapse;border:2px solid #d0d0d0;background:#fff;" cellpadding="0" cellspacing="0">
-    <!-- 헤더 -->
+  <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:900px;border-collapse:collapse;border:2px solid #d0d0d0;background:#ffffff;">
+    <!-- 헤더 행1: DESIGN CENTER -->
     <tr>
-      <td style="background:#18212f;padding:28px;">
-        <p style="margin:0 0 12px 0;font-size:11px;letter-spacing:1.6px;color:#9eb0c9;">DESIGN CENTER</p>
-        <table style="width:100%;border-collapse:collapse;" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="vertical-align:top;">
-              <p style="margin:0;font-size:24px;font-weight:700;color:#fff;">주간업무보고</p>
-              <p style="margin:6px 0 0 0;font-size:13px;color:#d6deea;">{html_lib.escape(date_range)}</p>
-            </td>
-            <td style="text-align:right;vertical-align:top;white-space:nowrap;">
-              <p style="margin:0;font-size:22px;font-weight:700;color:#fff;">{html_lib.escape(week)}</p>
-              <p style="margin:4px 0 0 0;font-size:12px;color:#d6deea;">{yy}년</p>
-            </td>
-          </tr>
-        </table>
+      <td colspan="2" bgcolor="#18212f" style="background-color:#18212f;padding:24px 28px 0 28px;">
+        <span style="font-size:11px;letter-spacing:1.6px;color:#9eb0c9;font-family:Arial,sans-serif;">DESIGN CENTER</span>
+      </td>
+    </tr>
+    <!-- 헤더 행2: 주간업무보고 | W17 -->
+    <tr>
+      <td bgcolor="#18212f" style="background-color:#18212f;padding:10px 0 0 28px;vertical-align:top;">
+        <span style="font-size:24px;font-weight:bold;color:#ffffff;font-family:Arial,sans-serif;">주간업무보고</span>
+      </td>
+      <td bgcolor="#18212f" width="100" style="background-color:#18212f;padding:10px 28px 0 0;text-align:right;vertical-align:top;white-space:nowrap;width:100px;">
+        <span style="font-size:22px;font-weight:bold;color:#ffffff;font-family:Arial,sans-serif;">{html_lib.escape(week)}</span>
+      </td>
+    </tr>
+    <!-- 헤더 행3: 날짜범위 | 연도 -->
+    <tr>
+      <td bgcolor="#18212f" style="background-color:#18212f;padding:4px 0 24px 28px;vertical-align:top;">
+        <span style="font-size:13px;color:#d6deea;font-family:Arial,sans-serif;">{html_lib.escape(date_range)}</span>
+      </td>
+      <td bgcolor="#18212f" width="100" style="background-color:#18212f;padding:4px 28px 24px 0;text-align:right;vertical-align:top;white-space:nowrap;width:100px;">
+        <span style="font-size:12px;color:#d6deea;font-family:Arial,sans-serif;">{yy}년</span>
       </td>
     </tr>
     <!-- 이번 주 주요 업무 -->
-    <tr><td style="padding:28px 28px 20px;">
-      <p style="font-size:14px;margin:0 0 10px 0;color:#666;font-weight:600;">✅ 이번 주 주요 업무</p>
-      <table style="width:100%;border-collapse:collapse;border:1px solid #ececec;" cellpadding="0" cellspacing="0">
-        <tr style="background:#fafafa;">
-          <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;width:18%">구분</th>
-          <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;">내용</th>
-          <th style="padding:10px 12px;text-align:center;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;width:70px">상태</th>
-        </tr>
-        {task_rows_html}
-      </table>
-    </td></tr>
+    <tr>
+      <td colspan="2" style="padding:28px 28px 20px;background:#ffffff;">
+        <p style="font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;font-family:Arial,sans-serif;">&#x2705; 이번 주 주요 업무</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ececec;">
+          <tr bgcolor="#fafafa" style="background-color:#fafafa;">
+            <th width="18%" style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:Arial,sans-serif;">구분</th>
+            <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:Arial,sans-serif;">내용</th>
+            <th width="70" style="padding:10px 12px;text-align:center;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:Arial,sans-serif;">상태</th>
+          </tr>
+          {task_rows_html}
+        </table>
+      </td>
+    </tr>
     {next_plan_section}
     <!-- 이슈 -->
-    <tr><td style="padding:0 28px 20px;">
-      <p style="font-size:14px;margin:0 0 10px 0;color:#666;font-weight:600;">⚠️ 이슈 / 협조 요청</p>
-      <p style="margin:0;color:#222;line-height:1.7;font-size:14px;">{html_lib.escape(s['issue_text'])}</p>
-    </td></tr>
+    <tr>
+      <td colspan="2" style="padding:0 28px 20px;background:#ffffff;">
+        <p style="font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;font-family:Arial,sans-serif;">&#x26a0;&#xfe0f; 이슈 / 협조 요청</p>
+        <p style="margin:0;color:#222;line-height:1.7;font-size:14px;font-family:Arial,sans-serif;">{html_lib.escape(s['issue_text'])}</p>
+      </td>
+    </tr>
     {note_section}
   </table>
 </body></html>"""
