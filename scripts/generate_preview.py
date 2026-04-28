@@ -166,8 +166,8 @@ def build_html(page, api_key):
   <p style="font-size:12px;color:#888;margin:0 0 12px 0;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
     ✂ 전체 선택(Ctrl+A 또는 ⌘A) → 복사 → Mailplug 붙여넣기 후 발송하세요.
   </p>
-  <div style="max-width:900px;border-radius:12px;overflow:hidden;border:2px solid #d0d0d0;">
-  <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:900px;border-collapse:collapse;background:#ffffff;border:2px solid #d0d0d0;">
+  <div style="display:inline-block;border-radius:12px;overflow:hidden;">
+  <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:900px;border-collapse:collapse;background:#ffffff;border:2px solid #d0d0d0;">
     <!-- 헤더 행1: DESIGN CENTER -->
     <tr>
       <td colspan="2" bgcolor="#18212f" style="background-color:#18212f;padding:24px 28px 0 28px;">
