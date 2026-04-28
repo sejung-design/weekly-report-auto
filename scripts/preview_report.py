@@ -205,7 +205,9 @@ def build_html(page, api_key) -> tuple[str, str]:
     ✂ 아래 내용을 전체 선택(Ctrl+A) → 복사(Ctrl+C) → Mailplug 본문에 붙여넣기(Ctrl+V) 하세요.
   </p>
   <div style="display:inline-block;border-radius:12px;overflow:hidden;">
-  <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:900px;border-collapse:collapse;background:#ffffff;border:2px solid #d0d0d0;">
+  <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:900px;border-collapse:collapse;">
+    <tr><td style="border:2px solid #d0d0d0;padding:0;">
+    <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:900px;border-collapse:collapse;background:#ffffff;">
     <!-- 헤더 행1: DESIGN CENTER -->
     <tr>
       <td colspan="2" bgcolor="#18212f" style="background-color:#18212f;padding:24px 28px 0 28px;">
@@ -253,6 +255,8 @@ def build_html(page, api_key) -> tuple[str, str]:
       </td>
     </tr>
     {note_section}
+    </table>
+    </td></tr>
   </table>
   </div>
 </body>

@@ -162,12 +162,14 @@ def build_html(page, api_key):
 <html><head><meta charset="UTF-8"><title>{html_lib.escape(subject)}</title>
 <style>@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap');</style>
 </head>
-<body style="margin:0;padding:24px;background:#f5f5f5;font-family:'Noto Sans KR','Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+<body style="margin:0;padding:24px;background:#f5f5f5;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
   <p style="font-size:12px;color:#888;margin:0 0 12px 0;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
     ✂ 전체 선택(Ctrl+A 또는 ⌘A) → 복사 → Mailplug 붙여넣기 후 발송하세요.
   </p>
   <div style="display:inline-block;border-radius:12px;overflow:hidden;">
-  <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:900px;border-collapse:collapse;background:#ffffff;border:2px solid #d0d0d0;">
+  <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:900px;border-collapse:collapse;">
+    <tr><td style="border:2px solid #d0d0d0;padding:0;">
+    <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:900px;border-collapse:collapse;background:#ffffff;">
     <!-- 헤더 행1: DESIGN CENTER -->
     <tr>
       <td colspan="2" bgcolor="#18212f" style="background-color:#18212f;padding:24px 28px 0 28px;">
@@ -215,6 +217,8 @@ def build_html(page, api_key):
       </td>
     </tr>
     {note_section}
+    </table>
+    </td></tr>
   </table>
   </div>
 </body></html>"""
