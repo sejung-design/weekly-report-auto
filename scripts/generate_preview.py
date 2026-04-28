@@ -140,7 +140,7 @@ def build_html(page, api_key):
     next_plan_html = "".join(f"<li style='margin:0 0 6px 0'>{html_lib.escape(i)}</li>" for i in s["next_plan_items"])
 
     next_plan_items_html = "".join(
-        f"<tr><td style='padding:2px 0;color:#222;font-size:14px;line-height:1.7'>• {html_lib.escape(i)}</td></tr>"
+        f"<tr><td style='padding:2px 0;color:#222;font-size:14px;line-height:1.7'>&bull; {html_lib.escape(i)}</td></tr>"
         for i in s["next_plan_items"]
     )
     next_plan_section = (
@@ -170,11 +170,11 @@ def build_html(page, api_key):
         <p style="margin:0 0 12px 0;font-size:11px;letter-spacing:1.6px;color:#9eb0c9;">DESIGN CENTER</p>
         <table style="width:100%;border-collapse:collapse;" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="vertical-align:bottom;">
+            <td style="vertical-align:top;">
               <p style="margin:0;font-size:24px;font-weight:700;color:#fff;">주간업무보고</p>
               <p style="margin:6px 0 0 0;font-size:13px;color:#d6deea;">{html_lib.escape(date_range)}</p>
             </td>
-            <td style="text-align:right;vertical-align:bottom;white-space:nowrap;">
+            <td style="text-align:right;vertical-align:top;white-space:nowrap;">
               <p style="margin:0;font-size:22px;font-weight:700;color:#fff;">{html_lib.escape(week)}</p>
               <p style="margin:4px 0 0 0;font-size:12px;color:#d6deea;">{yy}년</p>
             </td>
