@@ -163,12 +163,12 @@ def build_html(page, api_key) -> tuple[str, str]:
     def cell(text):
         return html_lib.escape(text).replace("\n", "<br>")
 
-    F = "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;"
+    F = "font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;"
     task_rows_html = "".join(
         f"<tr>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555;vertical-align:top;{F}font-size:14px'>{cell(r[0])}</td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222;vertical-align:top;{F}font-size:14px'>{cell(r[1])}</td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center;vertical-align:top;white-space:nowrap;{F}font-size:14px'>{cell(r[2])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555;vertical-align:top;{F}font-size:15px'>{cell(r[0])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222;vertical-align:top;{F}font-size:15px'>{cell(r[1])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center;vertical-align:top;white-space:nowrap;{F}font-size:15px'>{cell(r[2])}</td>"
         f"</tr>"
         for r in sections["task_rows"]
     )
@@ -178,65 +178,67 @@ def build_html(page, api_key) -> tuple[str, str]:
     )
 
     next_plan_items_html = "".join(
-        f"<tr><td colspan='2' style='padding:2px 0;color:#222;font-size:14px;line-height:1.7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif'>&bull; {html_lib.escape(i)}</td></tr>"
+        f"<tr><td colspan='2' style='padding:2px 0;color:#222;font-size:14px;line-height:1.7;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif'>&bull; {html_lib.escape(i)}</td></tr>"
         for i in sections["next_plan_items"]
     )
     next_plan_section = (
         f"<tr><td colspan='2' style='padding:0 28px 20px;background:#ffffff;'>"
-        f"<p style='font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif'>&#x1f51c; 다음 주 계획</p>"
+        f"<p style='font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif'>&#x1f51c; 다음 주 계획</p>"
         f"<table width='100%' cellpadding='0' cellspacing='0' style='border-collapse:collapse;'>{next_plan_items_html}</table>"
         f"</td></tr>"
     ) if sections["next_plan_items"] else ""
 
     note_section = (
         f"<tr><td colspan='2' style='padding:0 28px 28px;background:#ffffff;'>"
-        f"<p style='font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif'>&#x1f4ac; 비고</p>"
-        f"<p style='margin:0;color:#222;line-height:1.7;font-size:14px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif'>{html_lib.escape(sections['note_text'])}</p>"
+        f"<p style='font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif'>&#x1f4ac; 비고</p>"
+        f"<p style='margin:0;color:#222;line-height:1.7;font-size:14px;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif'>{html_lib.escape(sections['note_text'])}</p>"
         f"</td></tr>"
     ) if sections["note_text"] and sections["note_text"] != "없음" else ""
 
     body = f"""<!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>{html_lib.escape(subject)}</title></head>
-<body style="margin:0;padding:24px;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+<head><meta charset="UTF-8"><title>{html_lib.escape(subject)}</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap');</style>
+</head>
+<body style="margin:0;padding:24px;background:#f5f5f5;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
   <p style="font-size:12px;color:#888;margin:0 0 12px 0;">
     ✂ 아래 내용을 전체 선택(Ctrl+A) → 복사(Ctrl+C) → Mailplug 본문에 붙여넣기(Ctrl+V) 하세요.
   </p>
   <div style="max-width:900px;border-radius:12px;overflow:hidden;border:2px solid #d0d0d0;">
-  <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:900px;border-collapse:collapse;background:#ffffff;">
+  <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:900px;border-collapse:collapse;background:#ffffff;border:2px solid #d0d0d0;">
     <!-- 헤더 행1: DESIGN CENTER -->
     <tr>
       <td colspan="2" bgcolor="#18212f" style="background-color:#18212f;padding:24px 28px 0 28px;">
-        <span style="font-size:11px;letter-spacing:1.6px;color:#9eb0c9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">DESIGN CENTER</span>
+        <span style="font-size:11px;letter-spacing:1.6px;color:#9eb0c9;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">DESIGN CENTER</span>
       </td>
     </tr>
     <!-- 헤더 행2: 주간업무보고 | W17 -->
     <tr>
       <td bgcolor="#18212f" style="background-color:#18212f;padding:10px 0 0 28px;vertical-align:top;">
-        <span style="font-size:24px;font-weight:bold;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">주간업무보고</span>
+        <span style="font-size:24px;font-weight:bold;color:#ffffff;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">주간업무보고</span>
       </td>
       <td bgcolor="#18212f" width="100" style="background-color:#18212f;padding:10px 28px 0 0;text-align:right;vertical-align:top;white-space:nowrap;width:100px;">
-        <span style="font-size:22px;font-weight:bold;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{html_lib.escape(week)}</span>
+        <span style="font-size:22px;font-weight:bold;color:#ffffff;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{html_lib.escape(week)}</span>
       </td>
     </tr>
     <!-- 헤더 행3: 날짜범위 | 연도 -->
     <tr>
       <td bgcolor="#18212f" style="background-color:#18212f;padding:4px 0 24px 28px;vertical-align:top;">
-        <span style="font-size:13px;color:#d6deea;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{html_lib.escape(date_range)}</span>
+        <span style="font-size:13px;color:#d6deea;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{html_lib.escape(date_range)}</span>
       </td>
       <td bgcolor="#18212f" width="100" style="background-color:#18212f;padding:4px 28px 24px 0;text-align:right;vertical-align:top;white-space:nowrap;width:100px;">
-        <span style="font-size:12px;color:#d6deea;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{yy}년</span>
+        <span style="font-size:12px;color:#d6deea;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{yy}년</span>
       </td>
     </tr>
     <!-- 이번 주 주요 업무 -->
     <tr>
       <td colspan="2" style="padding:28px 28px 20px;background:#ffffff;">
-        <p style="font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">&#x2705; 이번 주 주요 업무</p>
+        <p style="font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">&#x2705; 이번 주 주요 업무</p>
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ececec;">
           <tr bgcolor="#fafafa" style="background-color:#fafafa;">
-            <th width="18%" style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">구분</th>
-            <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">내용</th>
-            <th width="70" style="padding:10px 12px;text-align:center;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">상태</th>
+            <th width="18%" style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">구분</th>
+            <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">내용</th>
+            <th width="70" style="padding:10px 12px;text-align:center;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">상태</th>
           </tr>
           {task_rows_html}
         </table>
@@ -246,8 +248,8 @@ def build_html(page, api_key) -> tuple[str, str]:
     <!-- 이슈 -->
     <tr>
       <td colspan="2" style="padding:0 28px 20px;background:#ffffff;">
-        <p style="font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">&#x26a0;&#xfe0f; 이슈 / 협조 요청</p>
-        <p style="margin:0;color:#222;line-height:1.7;font-size:14px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{html_lib.escape(sections['issue_text'])}</p>
+        <p style="font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">&#x26a0;&#xfe0f; 이슈 / 협조 요청</p>
+        <p style="margin:0;color:#222;line-height:1.7;font-size:14px;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{html_lib.escape(sections['issue_text'])}</p>
       </td>
     </tr>
     {note_section}
