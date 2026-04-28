@@ -184,7 +184,10 @@ def build_html(page, api_key) -> tuple[str, str]:
         f"</tr>"
         for r in s["task_rows"]
     )
-    next_plan_html = "".join(f"<li style='margin:0 0 6px 0'>{html_lib.escape(i)}</li>" for i in s["next_plan_items"])
+    next_plan_html = "".join(
+        f"<li style='margin:0 0 6px 0;color:#222;font-size:11pt !important;line-height:1.7;mso-line-height-rule:exactly;{F}'><span style='color:#222;font-size:11pt !important;line-height:1.7;mso-line-height-rule:exactly;{F}'>{html_lib.escape(i)}</span></li>"
+        for i in s["next_plan_items"]
+    )
     note_html = (
         f"<div style='padding:0 28px 28px'>"
         f"<h2 style='font-size:14px;margin:0 0 10px 0;color:#666'>💬 비고</h2>"

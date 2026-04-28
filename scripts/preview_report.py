@@ -179,7 +179,7 @@ def build_html(page, api_key) -> tuple[str, str]:
     )
 
     next_plan_items_html = "".join(
-        f"<tr><td colspan='2' style='padding:2px 0;color:#222;font-size:14px;line-height:1.7;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif'>&bull; {html_lib.escape(i)}</td></tr>"
+        f"<tr><td colspan='2' style='padding:2px 0;color:#222;font-size:11pt !important;line-height:1.7;mso-line-height-rule:exactly;{F}'><span style='color:#222;font-size:11pt !important;line-height:1.7;mso-line-height-rule:exactly;{F}'>&bull; {html_lib.escape(i)}</span></td></tr>"
         for i in sections["next_plan_items"]
     )
     next_plan_section = (

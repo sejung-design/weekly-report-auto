@@ -120,7 +120,7 @@ def build_html(meta, sections):
         for category, task, status in sections["task_rows"]
     )
     next_plan_html = "".join(
-        f"<li style='margin:0 0 6px 0'>{html.escape(item)}</li>"
+        f"<li style='margin:0 0 6px 0;color:#222;font-size:11pt !important;line-height:1.7;mso-line-height-rule:exactly;{F}'><span style='color:#222;font-size:11pt !important;line-height:1.7;mso-line-height-rule:exactly;{F}'>{html.escape(item)}</span></li>"
         for item in sections["next_plan_items"]
     )
     note_html = (
