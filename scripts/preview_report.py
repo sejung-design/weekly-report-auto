@@ -166,9 +166,9 @@ def build_html(page, api_key) -> tuple[str, str]:
     F = "font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;"
     task_rows_html = "".join(
         f"<tr>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555;vertical-align:top;{F}font-size:13px'>{cell(r[0])}</td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222;vertical-align:top;{F}font-size:13px'>{cell(r[1])}</td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center;vertical-align:top;white-space:nowrap;{F}font-size:13px'>{cell(r[2])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555;vertical-align:top;{F}font-size:11pt'>{cell(r[0])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222;vertical-align:top;{F}font-size:11pt'>{cell(r[1])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center;vertical-align:top;white-space:nowrap;{F}font-size:11pt'>{cell(r[2])}</td>"
         f"</tr>"
         for r in sections["task_rows"]
     )
@@ -226,7 +226,7 @@ def build_html(page, api_key) -> tuple[str, str]:
     <!-- 헤더 행3: 날짜범위 | 연도 -->
     <tr>
       <td bgcolor="#18212f" style="background-color:#18212f;padding:4px 0 24px 28px;vertical-align:top;">
-        <span style="font-size:13px;color:#d6deea;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{html_lib.escape(date_range)}</span>
+        <span style="font-size:11pt;color:#d6deea;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{html_lib.escape(date_range)}</span>
       </td>
       <td bgcolor="#18212f" width="100" style="background-color:#18212f;padding:4px 28px 24px 0;text-align:right;vertical-align:top;white-space:nowrap;width:100px;">
         <span style="font-size:12px;color:#d6deea;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{yy}년</span>
