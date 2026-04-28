@@ -107,12 +107,14 @@ def build_html(meta, sections):
         f"<li style='margin:0 0 6px 0'>{html.escape(item)}</li>"
         for item in sections["summary_items"]
     )
+    F = "font-family:Noto Sans KR,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;"
+    TABLE_BODY_TEXT = f"font-size:11pt !important;line-height:1.45;mso-line-height-rule:exactly;{F}"
     task_rows_html = "".join(
         (
             "<tr>"
-            f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555'>{html.escape(category)}</td>"
-            f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222'>{html.escape(task)}</td>"
-            f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center'>{html.escape(status)}</td>"
+            f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555;vertical-align:top;{TABLE_BODY_TEXT}'><span style='color:#555;{TABLE_BODY_TEXT}'>{html.escape(category)}</span></td>"
+            f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222;vertical-align:top;{TABLE_BODY_TEXT}'><span style='color:#222;{TABLE_BODY_TEXT}'>{html.escape(task)}</span></td>"
+            f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center;vertical-align:top;white-space:nowrap;{TABLE_BODY_TEXT}'><span style='color:#0b6bcb;{TABLE_BODY_TEXT}'>{html.escape(status)}</span></td>"
             "</tr>"
         )
         for category, task, status in sections["task_rows"]

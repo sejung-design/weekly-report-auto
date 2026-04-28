@@ -130,13 +130,13 @@ def build_html(page, api_key):
         return html_lib.escape(text).replace("\n", "<br>")
 
     summary_html = "".join(f"<li style='margin:0 0 6px 0'>{html_lib.escape(i)}</li>" for i in s["summary_items"])
-    F = "font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;"
-    FS = f"font-size:11pt;{F}"
+    F = "font-family:Noto Sans KR,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;"
+    TABLE_BODY_TEXT = f"font-size:11pt !important;line-height:1.45;mso-line-height-rule:exactly;{F}"
     task_rows_html = "".join(
         f"<tr>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;vertical-align:top;'><span style='color:#555;{FS}'>{cell(r[0])}</span></td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;vertical-align:top;'><span style='color:#222;{FS}'>{cell(r[1])}</span></td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;text-align:center;vertical-align:top;white-space:nowrap;'><span style='color:#0b6bcb;{FS}'>{cell(r[2])}</span></td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;vertical-align:top;color:#555;{TABLE_BODY_TEXT}'><span style='color:#555;{TABLE_BODY_TEXT}'>{cell(r[0])}</span></td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;vertical-align:top;color:#222;{TABLE_BODY_TEXT}'><span style='color:#222;{TABLE_BODY_TEXT}'>{cell(r[1])}</span></td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;text-align:center;vertical-align:top;white-space:nowrap;color:#0b6bcb;{TABLE_BODY_TEXT}'><span style='color:#0b6bcb;{TABLE_BODY_TEXT}'>{cell(r[2])}</span></td>"
         f"</tr>" for r in s["task_rows"]
     )
     next_plan_html = "".join(f"<li style='margin:0 0 6px 0'>{html_lib.escape(i)}</li>" for i in s["next_plan_items"])

@@ -174,11 +174,13 @@ def build_html(page, api_key) -> tuple[str, str]:
     s = parse_page_blocks(api_key, page["id"])
 
     summary_html = "".join(f"<li style='margin:0 0 6px 0'>{html_lib.escape(i)}</li>" for i in s["summary_items"])
+    F = "font-family:Noto Sans KR,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;"
+    TABLE_BODY_TEXT = f"font-size:11pt !important;line-height:1.45;mso-line-height-rule:exactly;{F}"
     task_rows_html = "".join(
         f"<tr>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555'>{html_lib.escape(r[0])}</td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222'>{html_lib.escape(r[1])}</td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center'>{html_lib.escape(r[2])}</td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#555;vertical-align:top;{TABLE_BODY_TEXT}'><span style='color:#555;{TABLE_BODY_TEXT}'>{html_lib.escape(r[0])}</span></td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#222;vertical-align:top;{TABLE_BODY_TEXT}'><span style='color:#222;{TABLE_BODY_TEXT}'>{html_lib.escape(r[1])}</span></td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;color:#0b6bcb;text-align:center;vertical-align:top;white-space:nowrap;{TABLE_BODY_TEXT}'><span style='color:#0b6bcb;{TABLE_BODY_TEXT}'>{html_lib.escape(r[2])}</span></td>"
         f"</tr>"
         for r in s["task_rows"]
     )

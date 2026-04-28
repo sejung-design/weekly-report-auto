@@ -163,13 +163,13 @@ def build_html(page, api_key) -> tuple[str, str]:
     def cell(text):
         return html_lib.escape(text).replace("\n", "<br>")
 
-    F = "font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;"
-    FS = f"font-size:11pt;{F}"
+    F = "font-family:Noto Sans KR,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;"
+    TABLE_BODY_TEXT = f"font-size:11pt !important;line-height:1.45;mso-line-height-rule:exactly;{F}"
     task_rows_html = "".join(
         f"<tr>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;vertical-align:top;'><span style='color:#555;{FS}'>{cell(r[0])}</span></td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;vertical-align:top;'><span style='color:#222;{FS}'>{cell(r[1])}</span></td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;text-align:center;vertical-align:top;white-space:nowrap;'><span style='color:#0b6bcb;{FS}'>{cell(r[2])}</span></td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;vertical-align:top;color:#555;{TABLE_BODY_TEXT}'><span style='color:#555;{TABLE_BODY_TEXT}'>{cell(r[0])}</span></td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;vertical-align:top;color:#222;{TABLE_BODY_TEXT}'><span style='color:#222;{TABLE_BODY_TEXT}'>{cell(r[1])}</span></td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;text-align:center;vertical-align:top;white-space:nowrap;color:#0b6bcb;{TABLE_BODY_TEXT}'><span style='color:#0b6bcb;{TABLE_BODY_TEXT}'>{cell(r[2])}</span></td>"
         f"</tr>"
         for r in sections["task_rows"]
     )
