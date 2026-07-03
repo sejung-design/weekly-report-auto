@@ -9,6 +9,7 @@ GitHub Pages URL을 Notion 페이지에 자동 추가합니다.
 from __future__ import annotations
 
 import html as html_lib
+import argparse
 import json
 import os
 import sys
@@ -247,18 +248,39 @@ def update_notion_status(api_key, page_id, status):
     })
 
 
+def finalize_preview(api_key, page_id, preview_url):
+    add_preview_link_to_notion(api_key, page_id, preview_url)
+    print("Notion preview link added")
+
+    update_notion_status(api_key, page_id, '발송승인')
+    print("Notion status updated")
+
+
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--finalize", action="store_true", help="Add a pushed preview URL to Notion.")
+    parser.add_argument("--page-id", help="Notion page id to update when finalizing.")
+    parser.add_argument("--preview-url", help="Preview URL to add when finalizing.")
+    args = parser.parse_args()
+
     api_key = require_env("NOTION_API_KEY")
+    if args.finalize:
+        if not args.page_id or not args.preview_url:
+            print("--finalize requires --page-id and --preview-url")
+            sys.exit(1)
+        finalize_preview(api_key, args.page_id, args.preview_url)
+        return
+
     db_id = require_env("NOTION_DATABASE_ID")
     pages_base = require_env("GITHUB_PAGES_BASE_URL").rstrip("/")
 
-    page = query_by_status(api_key, db_id, "승인")
+    page = query_by_status(api_key, db_id, '승인')
     if not page:
-        print("승인 상태인 페이지가 없습니다. 종료합니다.")
+        print("No approved page found. Exiting.")
         sys.exit(0)
 
     page_id = page["id"]
-    print(f"승인 페이지 발견: {page_id}")
+    print(f"Approved page found: {page_id}")
 
     html_content, subject, week, date_str = build_html(page, api_key)
 
@@ -266,20 +288,14 @@ def main():
     filename = f"preview_{week}_{date_str}.html"
     out_path = OUTPUT_DIR / filename
     out_path.write_text(html_content, encoding="utf-8")
-    print(f"HTML 생성: {filename}")
+    print(f"HTML created: {filename}")
 
     preview_url = f"{pages_base}/previews/{filename}"
-    print(f"미리보기 URL: {preview_url}")
+    print(f"Preview URL: {preview_url}")
 
-    add_preview_link_to_notion(api_key, page_id, preview_url)
-    print("Notion 페이지에 미리보기 링크 추가 완료")
-
-    update_notion_status(api_key, page_id, "발송승인")
-    print("Notion 상태 → 발송승인")
-
-    # GitHub Actions에서 커밋할 파일명 출력
     print(f"OUTPUT_FILE={out_path}")
-
+    print(f"PAGE_ID={page_id}")
+    print(f"PREVIEW_URL={preview_url}")
 
 if __name__ == "__main__":
     main()

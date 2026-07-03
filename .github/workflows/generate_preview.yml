@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: 코드 가져오기
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Python 설정
         uses: actions/setup-python@v5
@@ -33,7 +35,11 @@ jobs:
           output=$(python scripts/generate_preview.py)
           echo "$output"
           file=$(echo "$output" | grep "^OUTPUT_FILE=" | cut -d'=' -f2-)
+          page_id=$(echo "$output" | grep "^PAGE_ID=" | cut -d'=' -f2-)
+          preview_url=$(echo "$output" | grep "^PREVIEW_URL=" | cut -d'=' -f2-)
           echo "output_file=$file" >> $GITHUB_OUTPUT
+          echo "page_id=$page_id" >> $GITHUB_OUTPUT
+          echo "preview_url=$preview_url" >> $GITHUB_OUTPUT
 
       - name: HTML 파일 커밋 & 푸시
         if: steps.generate.outputs.output_file != ''
@@ -42,4 +48,15 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add previews/
           git diff --cached --quiet || git commit -m "auto: 미리보기 HTML 생성"
+          git pull --rebase origin main
           git push
+
+      - name: Notion preview link finalize
+        if: steps.generate.outputs.output_file != ''
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+        run: |
+          sleep 60
+          python scripts/generate_preview.py --finalize \
+            --page-id "${{ steps.generate.outputs.page_id }}" \
+            --preview-url "${{ steps.generate.outputs.preview_url }}"
