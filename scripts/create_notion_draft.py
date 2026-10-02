@@ -11,6 +11,7 @@ from urllib import error, request
 NOTION_API = "https://api.notion.com/v1"
 NOTION_VERSION = os.environ.get("NOTION_VERSION", "2025-09-03")
 SEOUL = timezone(timedelta(hours=9))
+RUN_WORKFLOW_URL = "https://github.com/sejung-design/weekly-report-auto/actions/workflows/generate_preview.yml"
 
 
 def require_env(name: str) -> str:
@@ -190,6 +191,22 @@ def page_children(meta: dict, draft: dict) -> list[dict]:
         paragraph(draft["issue"]),
         heading_2("💬 비고"),
         paragraph(draft["note"]),
+        {"type": "divider", "divider": {}},
+        {"type": "heading_3", "heading_3": {"rich_text": [text("🚀 승인 후 미리보기 즉시 생성")]}},
+        {
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": [
+                    text("상태를 '승인'으로 바꾼 뒤 → "),
+                    {
+                        "type": "text",
+                        "text": {"content": "Run workflow 페이지 열기", "link": {"url": RUN_WORKFLOW_URL}},
+                        "annotations": {"bold": True},
+                    },
+                    text(" → 우측 'Run workflow' 버튼 클릭"),
+                ],
+            },
+        },
     ]
 
 
