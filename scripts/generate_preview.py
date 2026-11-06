@@ -13,7 +13,7 @@ import argparse
 import json
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib import error, request
 
@@ -297,7 +297,8 @@ def main():
     html_content, subject, week, date_str = build_html(page, api_key)
 
     OUTPUT_DIR.mkdir(exist_ok=True)
-    filename = f"preview_{week}_{date_str}.html"
+    stamp = datetime.now(timezone(timedelta(hours=9))).strftime("%H%M%S")
+    filename = f"preview_{week}_{date_str}_{stamp}.html"
     out_path = OUTPUT_DIR / filename
     out_path.write_text(html_content, encoding="utf-8")
     print(f"HTML created: {filename}")
