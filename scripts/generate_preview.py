@@ -22,6 +22,28 @@ NOTION_API = "https://api.notion.com/v1"
 NOTION_VERSION = "2022-06-28"
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "previews"
 
+# Copies only the report table; Ctrl+A also copies the page wrapper, which Outlook draws as grey lines.
+COPY_SCRIPT = """<script>
+(function () {
+  var copying = false;
+  document.addEventListener('copy', function (e) {
+    if (!copying) return;
+    var el = document.getElementById('report');
+    e.clipboardData.setData('text/html', el.outerHTML);
+    e.clipboardData.setData('text/plain', el.innerText);
+    e.preventDefault();
+  });
+  document.getElementById('copy-btn').addEventListener('click', function () {
+    copying = true;
+    var ok = document.execCommand('copy');
+    copying = false;
+    document.getElementById('copy-msg').textContent = ok
+      ? '복사됨! Mailplug 본문에 붙여넣기(Ctrl+V) 하세요.'
+      : '복사 실패: Ctrl+A → Ctrl+C로 복사해 주세요.';
+  });
+})();
+</script>"""
+
 
 def require_env(key: str) -> str:
     val = os.environ.get(key, "").strip()
@@ -83,7 +105,7 @@ def fetch_blocks(api_key, block_id):
 
 def parse_blocks(api_key, page_id):
     blocks = fetch_blocks(api_key, page_id)
-    s = {"summary_items": [], "task_rows": [], "next_plan_items": [], "issue_text": "없음", "note_text": ""}
+    s = {"summary_items": [], "task_rows": [], "next_plan_items": [], "issue_items": [], "note_items": []}
     MAP = {
         "📌 이번 주 핵심 요약": "summary", "✅ 이번 주 주요 업무": "tasks",
         "🔜 다음 주 계획": "next_plan", "⚠️ 이슈 / 협조 요청": "issue", "💬 비고": "note",
@@ -97,6 +119,7 @@ def parse_blocks(api_key, page_id):
             txt = plain_text(b["bulleted_list_item"]["rich_text"])
             if cur == "summary": s["summary_items"].append(txt)
             elif cur == "next_plan": s["next_plan_items"].append(txt)
+            elif cur in ("issue", "note") and txt: s[f"{cur}_items"].append((txt, True))
         elif bt == "table":
             rows = fetch_blocks(api_key, b["id"])
             for i, row in enumerate(rows):
@@ -106,8 +129,7 @@ def parse_blocks(api_key, page_id):
                     s["task_rows"].append((plain_text(cells[0]), plain_text(cells[1]), plain_text(cells[2])))
         elif bt == "paragraph":
             txt = plain_text(b["paragraph"]["rich_text"])
-            if cur == "issue" and txt: s["issue_text"] = txt
-            elif cur == "note" and txt: s["note_text"] = txt
+            if cur in ("issue", "note") and txt: s[f"{cur}_items"].append((txt, False))
     return s
 
 
@@ -133,45 +155,54 @@ def build_html(page, api_key):
     summary_html = "".join(f"<li style='margin:0 0 6px 0'>{html_lib.escape(i)}</li>" for i in s["summary_items"])
     F = "font-family:Noto Sans KR,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;"
     TABLE_BODY_TEXT = f"font-size:11pt !important;line-height:1.45;mso-line-height-rule:exactly;{F}"
+    COL_LINE = "border-right:1px solid #ececec;"
     task_rows_html = "".join(
         f"<tr>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;vertical-align:top;color:#555;{TABLE_BODY_TEXT}'><span style='color:#555;{TABLE_BODY_TEXT}'>{cell(r[0])}</span></td>"
-        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;vertical-align:top;color:#222;{TABLE_BODY_TEXT}'><span style='color:#222;{TABLE_BODY_TEXT}'>{cell(r[1])}</span></td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;{COL_LINE}vertical-align:top;color:#555;{TABLE_BODY_TEXT}'><span style='color:#555;{TABLE_BODY_TEXT}'>{cell(r[0])}</span></td>"
+        f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;{COL_LINE}vertical-align:top;color:#222;{TABLE_BODY_TEXT}'><span style='color:#222;{TABLE_BODY_TEXT}'>{cell(r[1])}</span></td>"
         f"<td style='padding:10px 12px;border-bottom:1px solid #ececec;text-align:center;vertical-align:top;white-space:nowrap;color:#0b6bcb;{TABLE_BODY_TEXT}'><span style='color:#0b6bcb;{TABLE_BODY_TEXT}'>{cell(r[2])}</span></td>"
         f"</tr>" for r in s["task_rows"]
     )
-    next_plan_html = "".join(f"<li style='margin:0 0 6px 0'>{html_lib.escape(i)}</li>" for i in s["next_plan_items"])
 
-    next_plan_items_html = "".join(
-        f"<tr><td colspan='2' style='padding:2px 0;color:#222;font-size:11pt !important;line-height:1.7;mso-line-height-rule:exactly;{F}'><span style='color:#222;font-size:11pt !important;line-height:1.7;mso-line-height-rule:exactly;{F}'>&bull; {html_lib.escape(i)}</span></td></tr>"
-        for i in s["next_plan_items"]
-    )
+    LIST_TEXT = f"font-size:11pt !important;line-height:1.7;mso-line-height-rule:exactly;{F}"
+
+    def list_section(title, items, bottom_pad=20):
+        rows = "".join(
+            f"<tr><td style='padding:2px 0;color:#222;{LIST_TEXT}'><span style='color:#222;{LIST_TEXT}'>"
+            f"{'&bull; ' if bullet else ''}{html_lib.escape(txt)}</span></td></tr>"
+            for txt, bullet in items
+        )
+        return (
+            f"<tr><td colspan='2' style='padding:0 28px {bottom_pad}px;background:#ffffff;'>"
+            f"<p style='font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;{F}'>{title}</p>"
+            f"<table width='100%' cellpadding='0' cellspacing='0' border='0' style='border-collapse:collapse;'>{rows}</table>"
+            f"</td></tr>"
+        )
+
     next_plan_section = (
-        f"<tr><td colspan='2' style='padding:0 28px 20px;background:#ffffff;'>"
-        f"<p style='font-size:14px;margin:0 0 10px 0;color:#666;font-weight:600'>🔜 다음 주 계획</p>"
-        f"<table width='100%' cellpadding='0' cellspacing='0' style='border-collapse:collapse;'>{next_plan_items_html}</table>"
-        f"</td></tr>"
-    ) if s["next_plan_items"] else ""
-
-    note_section = (
-        f"<tr><td colspan='2' style='padding:0 28px 28px;background:#ffffff;'>"
-        f"<p style='font-size:14px;margin:0 0 10px 0;color:#666;font-weight:600'>💬 비고</p>"
-        f"<p style='margin:0;color:#222;line-height:1.7;font-size:14px'>{html_lib.escape(s['note_text'])}</p>"
-        f"</td></tr>"
-    ) if s["note_text"] and s["note_text"] != "없음" else ""
+        list_section("🔜 다음 주 계획", [(i, True) for i in s["next_plan_items"]])
+        if s["next_plan_items"] else ""
+    )
+    issue_section = list_section("&#x26a0;&#xfe0f; 이슈 / 협조 요청", s["issue_items"] or [("없음", False)])
+    has_note = any(txt not in ("없음", "-") for txt, _ in s["note_items"])
+    note_section = list_section("💬 비고", s["note_items"], bottom_pad=28) if has_note else ""
 
     body = f"""<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>{html_lib.escape(subject)}</title>
 <style>@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap');</style>
 </head>
-<body style="margin:0;padding:24px;background:#f5f5f5;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+<body style="margin:0;padding:24px;background:#ffffff;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
   <p style="font-size:12px;color:#888;margin:0 0 12px 0;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
-    ✂ 전체 선택(Ctrl+A 또는 ⌘A) → 복사 → Mailplug 붙여넣기 후 발송하세요.
+    <button id="copy-btn" type="button" style="font-size:13px;font-weight:bold;padding:8px 16px;margin-right:8px;border:0;border-radius:6px;background:#18212f;color:#ffffff;cursor:pointer;">본문 복사</button>
+    <span id="copy-msg">버튼을 누른 뒤 Mailplug 본문에 붙여넣기(Ctrl+V) 하세요.</span>
   </p>
   <div style="display:inline-block;border-radius:12px;overflow:hidden;">
-  <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:900px;border-collapse:collapse;">
+  <table id="report" width="900" cellpadding="0" cellspacing="0" border="0" style="width:900px;border-collapse:collapse;">
     <tr><td style="border:2px solid #d0d0d0;padding:0;">
     <table width="900" cellpadding="0" cellspacing="0" border="0" style="width:900px;border-collapse:collapse;background:#ffffff;">
+    <!-- 헤더: Outlook이 행 사이에 흰 틈을 그리지 않도록 남색 셀 하나로 감쌈 -->
+    <tr><td colspan="2" bgcolor="#18212f" style="background-color:#18212f;padding:0;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#18212f" style="width:100%;border-collapse:collapse;background-color:#18212f;">
     <!-- 헤더 행1: DESIGN CENTER -->
     <tr>
       <td colspan="2" bgcolor="#18212f" style="background-color:#18212f;padding:24px 28px 0 28px;">
@@ -196,14 +227,16 @@ def build_html(page, api_key):
         <span style="font-size:12px;color:#d6deea;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{yy}년</span>
       </td>
     </tr>
+    </table>
+    </td></tr>
     <!-- 이번 주 주요 업무 -->
     <tr>
       <td colspan="2" style="padding:28px 28px 20px;background:#ffffff;">
         <p style="font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">&#x2705; 이번 주 주요 업무</p>
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ececec;">
           <tr bgcolor="#fafafa" style="background-color:#fafafa;">
-            <th width="18%" style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">구분</th>
-            <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">내용</th>
+            <th width="18%" style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;border-right:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">구분</th>
+            <th style="padding:10px 12px;text-align:left;border-bottom:1px solid #ececec;border-right:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">내용</th>
             <th width="70" style="padding:10px 12px;text-align:center;border-bottom:1px solid #ececec;color:#555;font-size:14px;font-weight:600;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">상태</th>
           </tr>
           {task_rows_html}
@@ -211,18 +244,13 @@ def build_html(page, api_key):
       </td>
     </tr>
     {next_plan_section}
-    <!-- 이슈 -->
-    <tr>
-      <td colspan="2" style="padding:0 28px 20px;background:#ffffff;">
-        <p style="font-size:14px;margin:0 0 10px 0;color:#666;font-weight:bold;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">&#x26a0;&#xfe0f; 이슈 / 협조 요청</p>
-        <p style="margin:0;color:#222;line-height:1.7;font-size:14px;font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">{html_lib.escape(s['issue_text'])}</p>
-      </td>
-    </tr>
+    {issue_section}
     {note_section}
     </table>
     </td></tr>
   </table>
   </div>
+  {COPY_SCRIPT}
 </body></html>"""
 
     return body, subject, week, date_str
